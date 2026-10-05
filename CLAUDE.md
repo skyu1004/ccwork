@@ -50,6 +50,7 @@ src/
 ## 구현 패턴
 
 **API 계층 (`api/notes.ts`)**
+
 - 함수 단위 `fetch` 래퍼이고, `!res.ok`이면 `throw new Error('Failed to ...')`한다.
 - `API_URL`이 하드코딩돼 있다(`http://localhost:3001`). Vite 프록시나 env 변수는 쓰지 않는다.
 - `createdAt`/`updatedAt`은 서버가 아니라 **클라이언트에서** ISO 문자열로 채운다. `updateNote`는 `PATCH`이고 `updatedAt`을 자동 갱신한다.
@@ -63,6 +64,7 @@ src/
   - 성공 응답은 `return res.json()`으로 그대로 반환한다. 응답 가공이나 검증은 하지 않는다.
 
 **상태 관리 (`NotesContext`)**
+
 - 변경 함수(`createNote`/`updateNote`/`deleteNote`)는 API 호출이 **성공한 뒤에** 로컬 state를 갱신한다. 낙관적 업데이트는 없다.
 - 변경 함수는 에러를 삼키지 않고 throw한다. 호출한 컴포넌트가 `try/catch`로 처리한다 (`NoteEditor.handleSave` 참고). 반면 `error` 상태는 초기 `fetchNotes` 실패에만 쓰인다.
 - `useNotes()`는 Provider 밖에서 호출하면 throw한다.
@@ -77,6 +79,7 @@ src/
   - Context value 객체는 메모이제이션하지 않는다 (`useMemo`/`useCallback` 없음).
 
 **컴포넌트**
+
 - 함수 컴포넌트 + named export (`export function X`). 기본 export는 `App`만 쓴다.
 - props 인터페이스를 컴포넌트 바로 위에 `XxxProps`로 선언한다.
 - `Layout`은 `sidebar`/`main`을 `ReactNode` 슬롯 props로 받는다.
@@ -93,6 +96,7 @@ src/
   - `Layout`의 본문 높이는 `calc(100vh - 65px)`(헤더 높이)로 고정돼 있다. 헤더 높이를 바꾸면 함께 수정한다.
 
 **스타일링**
+
 - Tailwind 4 유틸리티 클래스를 JSX에 직접 쓴다. CSS 모듈이나 styled-components는 쓰지 않는다.
 - 색상은 `index.css`의 `@theme` 토큰(`background`, `card`, `foreground`, `muted`, `muted-foreground`, `border`, `destructive`)만 쓴다. 하드코딩한 색 값을 새로 도입하지 않는다.
 - 카드형 둥근 모서리(`rounded-2xl`/`rounded-3xl`), 버튼은 `bg-foreground text-card rounded-xl` 조합, 섹션 라벨은 `text-xs uppercase tracking-widest` 조합이 반복된다. 새 UI도 이 패턴을 따른다.
@@ -102,17 +106,17 @@ src/
 
 코드에서 일관되게 관찰되는 규칙이다. 새 코드도 같은 이름 체계를 따른다.
 
-| 대상 | 규칙 | 예 |
-|------|------|-----|
-| 컴포넌트 파일 | PascalCase, 파일명 = 컴포넌트명 | `NoteEditor.tsx` → `NoteEditor` |
-| 비컴포넌트 파일 | 도메인 단수형 소문자 (`api/`, `types/`), Context만 PascalCase | `api/notes.ts`, `types/note.ts`, `NotesContext.tsx` |
-| Props 인터페이스 | `{컴포넌트명}Props`, 컴포넌트 바로 위에 선언 | `NoteItemProps` |
-| Context 관련 | `{도메인}Context` / `{도메인}Provider` / `use{도메인}` / `{도메인}ContextType` | `NotesContext`, `NotesProvider`, `useNotes` |
-| 콜백 props | `on` + 동사 (명사) | `onSelect`, `onDelete`, `onDone`, `onNewNote` |
-| 내부 이벤트 핸들러 | `handle` + 동사 (명사) | `handleSelectNote`, `handleNewNote`, `handleSave` |
-| 상태 | `[값, set값]` 쌍 | `[title, setTitle]` |
-| 불리언 상태/props | `is` 접두사가 기본. 진행 상태(`loading`, `saving`)는 접두사 없음 | `isSelected`, `isCreating` |
-| 모듈 상수 | UPPER_SNAKE_CASE | `API_URL` |
+| 대상               | 규칙                                                                           | 예                                                  |
+| ------------------ | ------------------------------------------------------------------------------ | --------------------------------------------------- |
+| 컴포넌트 파일      | PascalCase, 파일명 = 컴포넌트명                                                | `NoteEditor.tsx` → `NoteEditor`                     |
+| 비컴포넌트 파일    | 도메인 단수형 소문자 (`api/`, `types/`), Context만 PascalCase                  | `api/notes.ts`, `types/note.ts`, `NotesContext.tsx` |
+| Props 인터페이스   | `{컴포넌트명}Props`, 컴포넌트 바로 위에 선언                                   | `NoteItemProps`                                     |
+| Context 관련       | `{도메인}Context` / `{도메인}Provider` / `use{도메인}` / `{도메인}ContextType` | `NotesContext`, `NotesProvider`, `useNotes`         |
+| 콜백 props         | `on` + 동사 (명사)                                                             | `onSelect`, `onDelete`, `onDone`, `onNewNote`       |
+| 내부 이벤트 핸들러 | `handle` + 동사 (명사)                                                         | `handleSelectNote`, `handleNewNote`, `handleSave`   |
+| 상태               | `[값, set값]` 쌍                                                               | `[title, setTitle]`                                 |
+| 불리언 상태/props  | `is` 접두사가 기본. 진행 상태(`loading`, `saving`)는 접두사 없음               | `isSelected`, `isCreating`                          |
+| 모듈 상수          | UPPER_SNAKE_CASE                                                               | `API_URL`                                           |
 
 **CRUD 동사는 계층과 무관하게 `create/update/delete`로 통일한다.** `api/notes.ts`와 `NotesContext`가 같은 이름(`createNote`/`updateNote`/`deleteNote`)을 쓴다. `add`/`edit`/`remove` 같은 동의어는 쓰지 않는다. 조회만 api는 `fetchNotes`, 컨텍스트는 `notes` state(마운트 시 자동 로드)다. 컴포넌트 콜백 prop도 같은 동사를 쓴다(`onDelete`).
 
@@ -139,4 +143,8 @@ src/
 - Prettier: 세미콜론, 작은따옴표, 2칸 들여쓰기, trailing comma `all`, printWidth 100.
 - TypeScript `strict`에 `noUnusedLocals`/`noUnusedParameters`가 켜져 있어 미사용 변수는 빌드 에러다.
 - ESLint 9 flat config(`eslint.config.js`): typescript-eslint recommended + react-hooks + react-refresh. 컴포넌트 파일에서는 컴포넌트가 아닌 것을 export하면 경고가 난다. 단, `NotesContext.tsx`는 Provider와 훅을 함께 export하고 있다.
+- 커밋 메시지는 commitlint(`commitlint.config.mjs`, `config-conventional` 기반)가 `.husky/commit-msg` 훅에서 검사한다. 규칙에 어긋나면 커밋이 차단된다.
+  - 형식: `type: 제목` + 빈 줄 + 본문 (`feat`, `fix`, `docs`, `refactor`, `chore` 등 conventional type)
+  - 제목은 필수, 본문도 필수이며 비어 있지 않은 줄이 **최소 2줄**이어야 한다 (footer의 `Co-Authored-By`는 줄 수에 안 센다).
+  - 본문 한 줄은 100자 이내로 쓴다. 제목과 본문은 한국어로 쓴다.
 - 테스트는 Vitest 설정이 `vite.config.ts`의 `test` 블록에 있다 (jsdom, globals 활성화, setup은 `src/test-setup.ts`). 테스트 파일은 `src/` 아래에 두면 `tsc`의 `include: ["src"]`에 포함되므로 타입 체크 대상이 된다.
